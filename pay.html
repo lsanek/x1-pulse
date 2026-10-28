@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XEN Burn Payment</title>
+<meta name="description" content="Activate X1 Rug Checker group protection by permanently burning XEN on Ethereum.">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--fg:#14161a;--muted:#5d6470;--line:#e2e5ea;--accent:#e4572e;--accent-fg:#fff;--ok:#1a7f4b;--err:#b42318;--warn-bg:#fff6e5;--warn-fg:#7a4b00;--mono:ui-monospace,SFMono-Regular,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1115;--card:#171a20;--fg:#eceef2;--muted:#9aa3b2;--line:#2a2f38;--accent:#ff6a3d;--accent-fg:#111;--ok:#4ade80;--err:#f87171;--warn-bg:#2a2112;--warn-fg:#f5c46b}}
+:root[data-theme="dark"]{--bg:#0f1115;--card:#171a20;--fg:#eceef2;--muted:#9aa3b2;--line:#2a2f38;--accent:#ff6a3d;--accent-fg:#111;--ok:#4ade80;--err:#f87171;--warn-bg:#2a2112;--warn-fg:#f5c46b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:560px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:1.5rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
+label{display:block;font-weight:600;margin:14px 0 6px}
+label:first-child{margin-top:0}
+input[type=text]{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);font:15px var(--mono)}
+.hint{color:var(--muted);font-size:.85rem;margin-top:4px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:.92rem}
+.row:last-child{border-bottom:0}
+.row span:last-child{font-family:var(--mono);text-align:right;overflow-wrap:anywhere}
+button{width:100%;padding:13px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:1rem;cursor:pointer;margin-top:12px}
+button.secondary{background:transparent;color:var(--fg);border:1px solid var(--line);font-weight:600}
+button:disabled{opacity:.45;cursor:not-allowed}
+.check{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:.9rem}
+.check input{margin-top:4px}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;background:var(--warn-bg);color:var(--warn-fg);font-size:.8rem;font-weight:700;vertical-align:middle}
+#log{font-size:.9rem;white-space:pre-wrap;word-break:break-word}
+#log .ok{color:var(--ok)} #log .err{color:var(--err)}
+a{color:var(--accent)}
+.warn{background:var(--warn-bg);color:var(--warn-fg);border-radius:10px;padding:10px 12px;font-size:.9rem;margin-top:12px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<main>
+  <h1>🔥 Pay by burning XEN <span id="netBadge" class="badge hidden"></span></h1>
+  <p class="sub">Activates <b>X1 Rug Checker</b> group protection. Your XEN is burned forever through XEN's official <code>burn()</code> (Proof of Burn).</p>
+
+  <div class="card">
+    <label for="group">Telegram group ID</label>
+    <input id="group" type="text" inputmode="numeric" autocomplete="off" placeholder="-1001234567890">
+    <div class="hint">Shown by <code>/payxen</code> in your group. Group IDs are negative.</div>
+
+    <label for="amount">XEN to burn</label>
+    <input id="amount" type="text" inputmode="numeric" autocomplete="off" placeholder="6300000000">
+    <div class="hint" id="amountHint">Whole XEN. Smaller burns are saved as credit and add up.</div>
+  </div>
+
+  <div class="card">
+    <div class="row"><span>Network</span><span id="cNet">…</span></div>
+    <div class="row"><span>Payment contract</span><span id="cContract">…</span></div>
+    <div class="row"><span>XEN token</span><span id="cXen">…</span></div>
+    <div class="row"><span>Wallet</span><span id="cWallet">not connected</span></div>
+    <div class="row"><span>Your XEN balance</span><span id="cBal">–</span></div>
+    <div class="row"><span>Your total Proof of Burn</span><span id="cBurns">–</span></div>
+
+    <label class="check"><input type="checkbox" id="ack"> <span>I checked the group ID. Burned XEN cannot be refunded.</span></label>
+
+    <button id="btnConnect">Connect wallet</button>
+    <button id="btnPay" disabled>Approve &amp; burn</button>
+    <button id="btnFaucet" class="secondary hidden">Get 10 000 000 000 test XEN (testnet only)</button>
+    <div id="noWallet" class="warn hidden">No wallet found. Install <b>MetaMask</b> in this browser, or on a phone open this page inside the MetaMask app: <a id="mmLink" href="#">open in MetaMask</a>.</div>
+  </div>
+
+  <div class="card"><div id="log">Loading configuration…</div></div>
+  <p class="hint">Two wallet confirmations: <b>Approve</b> lets the contract burn exactly this amount, <b>Pay</b> burns it. The contract has no owner, holds no funds and can only burn the caller's own XEN. The bot activates protection automatically after ~3 minutes of confirmations.</p>
+</main>
+
+<script>
+"use strict";
+// Official XEN Crypto on Ethereum mainnet (verified source on Etherscan / Blockscout).
+const OFFICIAL_XEN = "0x06450dee7fd2fb8e39061434babcfc05599a6fb8";
+const SEL = {approve:"095ea7b3", allowance:"dd62ed3e", balanceOf:"70a08231", xen:"9055c515",
+             pay:"fe802b63", faucet:"57915897", userBurns:"ce653d5f"};
+const WEI = 10n ** 18n;
+let CFG = null, account = null;
+
+const $ = id => document.getElementById(id);
+function out(msg, cls){ const d=document.createElement("div"); if(cls) d.className=cls; d.textContent=msg; $("log").appendChild(d); }
+function resetLog(msg){ $("log").textContent=""; if(msg) out(msg); }
+const pad = h => h.replace(/^0x/,"").padStart(64,"0");
+const encAddr = a => pad(a.toLowerCase());
+const encUint = v => pad(BigInt(v).toString(16));
+const encInt64 = v => pad(((BigInt(v) + (1n<<256n)) % (1n<<256n)).toString(16));
+const fmtXen = wei => (wei / WEI).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+const short = a => a.slice(0,6)+"…"+a.slice(-4);
+
+async function rpc(method, params){ return window.ethereum.request({method, params}); }
+async function call(to, data){ return rpc("eth_call", [{to, data:"0x"+data}, "latest"]); }
+async function send(to, data){ return rpc("eth_sendTransaction", [{from:account, to, data:"0x"+data}]); }
+async function waitTx(hash, label){
+  out(`${label}: sent ${short(hash)} – waiting for the block…`);
+  for(let i=0;i<200;i++){
+    const r = await rpc("eth_getTransactionReceipt",[hash]);
+    if(r){ if(r.status!=="0x1") throw new Error(label+" failed on-chain"); return r; }
+    await new Promise(s=>setTimeout(s,3000));
+  }
+  throw new Error(label+" not mined after 10 minutes – check your wallet");
+}
+
+function readInputs(){
+  const g = $("group").value.trim(), a = $("amount").value.replace(/[\s_,]/g,"");
+  if(!/^-?\d{1,19}$/.test(g) || BigInt(g)===0n) throw new Error("Invalid group ID.");
+  const gid = BigInt(g);
+  if(gid < -(1n<<63n) || gid >= (1n<<63n)) throw new Error("Group ID out of range.");
+  if(!/^\d{1,15}$/.test(a) || BigInt(a)===0n) throw new Error("Enter a whole XEN amount greater than 0.");
+  return {gid, wei: BigInt(a) * WEI};
+}
+
+async function ensureChain(){
+  const want = "0x"+CFG.chainId.toString(16);
+  const have = await rpc("eth_chainId",[]);
+  if(have.toLowerCase()===want) return;
+  try { await rpc("wallet_switchEthereumChain",[{chainId:want}]); }
+  catch(e){ throw new Error(`Please switch your wallet to ${CFG.name} and try again.`); }
+}
+
+async function verifyContract(){
+  const res = await call(CFG.contract, SEL.xen);
+  const xen = ("0x"+res.slice(-40)).toLowerCase();
+  if(xen !== CFG.xen) throw new Error("Safety check failed: payment contract does not burn the configured XEN token. Do not continue.");
+  if(CFG.chainId===1 && xen !== OFFICIAL_XEN) throw new Error("Safety check failed: not the official XEN contract. Do not continue.");
+}
+
+async function refresh(){
+  if(!account) return;
+  const bal = BigInt(await call(CFG.xen, SEL.balanceOf+encAddr(account)));
+  const burns = BigInt(await call(CFG.xen, SEL.userBurns+encAddr(account)));
+  $("cBal").textContent = fmtXen(bal)+" XEN";
+  $("cBurns").textContent = fmtXen(burns)+" XEN";
+  return bal;
+}
+
+async function connect(){
+  try{
+    const accs = await rpc("eth_requestAccounts",[]);
+    account = accs[0];
+    $("cWallet").textContent = short(account);
+    await ensureChain();
+    await verifyContract();
+    await refresh();
+    $("btnPay").disabled = false;
+    $("btnConnect").textContent = "Wallet connected";
+    $("btnConnect").disabled = true;
+    if(CFG.testnet) $("btnFaucet").classList.remove("hidden");
+    resetLog("✅ Wallet connected and contract verified. Check the values and tap “Approve & burn”.");
+  }catch(e){ out("❌ "+(e.message||e), "err"); }
+}
+
+async function payFlow(){
+  $("btnPay").disabled = true;
+  try{
+    if(!$("ack").checked) throw new Error("Please tick the confirmation box first.");
+    const {gid, wei} = readInputs();
+    resetLog(`Burning ${fmtXen(wei)} XEN for group ${gid}…`);
+    await ensureChain();
+    await verifyContract();
+    const bal = await refresh();
+    if(bal < wei) throw new Error(`Not enough XEN: you have ${fmtXen(bal)}, need ${fmtXen(wei)}.`);
+    const allowance = BigInt(await call(CFG.xen, SEL.allowance+encAddr(account)+encAddr(CFG.contract)));
+    if(allowance < wei){
+      out("Step 1/2: confirm APPROVE in your wallet (exact amount, not unlimited).");
+      await waitTx(await send(CFG.xen, SEL.approve+encAddr(CFG.contract)+encUint(wei)), "Approve");
+      out("Approve confirmed.", "ok");
+    } else out("Step 1/2: allowance already set – skipping approve.");
+    out("Step 2/2: confirm PAY in your wallet – this burns your XEN.");
+    const r = await waitTx(await send(CFG.contract, SEL.pay+encUint(wei)+encInt64(gid)), "Pay");
+    out(`🔥 Done! ${fmtXen(wei)} XEN burned in block ${parseInt(r.blockNumber,16)}.`, "ok");
+    const a = document.createElement("a"); a.href = CFG.explorer+"/tx/"+r.transactionHash; a.target="_blank"; a.rel="noopener";
+    a.textContent = "View transaction"; $("log").appendChild(a);
+    out("The bot will confirm in the group in about 3 minutes. You can close this page.");
+    await refresh();
+  }catch(e){ out("❌ "+(e.message||e), "err"); }
+  $("btnPay").disabled = false;
+}
+
+async function faucet(){
+  try{
+    await ensureChain();
+    out("Requesting test XEN…");
+    await waitTx(await send(CFG.xen, SEL.faucet+encUint(10_000_000_000n*WEI)), "Faucet");
+    out("Test XEN received.", "ok"); await refresh();
+  }catch(e){ out("❌ "+(e.message||e), "err"); }
+}
+
+(async function init(){
+  const q = new URLSearchParams(location.search);
+  if(q.get("g")) $("group").value = q.get("g");
+  if(q.get("a")) $("amount").value = q.get("a");
+  $("mmLink").href = "https://metamask.app.link/dapp/" + location.host + location.pathname + location.search;
+  try{
+    const r = await fetch("xenpay.json", {cache:"no-store"});
+    if(!r.ok) throw new Error("xenpay.json not found");
+    CFG = await r.json();
+    CFG.contract = CFG.contract.toLowerCase(); CFG.xen = CFG.xen.toLowerCase();
+    if(!/^0x[0-9a-f]{40}$/.test(CFG.contract) || !/^0x[0-9a-f]{40}$/.test(CFG.xen)) throw new Error("bad config");
+    if(CFG.chainId===1 && CFG.xen!==OFFICIAL_XEN) throw new Error("config XEN is not the official XEN");
+  }catch(e){ resetLog("❌ Payment is not configured yet ("+e.message+")."); $("btnConnect").disabled=true; return; }
+  $("cNet").textContent = CFG.name;
+  $("cContract").textContent = CFG.contract;
+  $("cXen").textContent = CFG.xen;
+  if(CFG.testnet){ $("netBadge").textContent="TESTNET"; $("netBadge").classList.remove("hidden"); }
+  if(!window.ethereum){ $("noWallet").classList.remove("hidden"); $("btnConnect").disabled=true; resetLog("No wallet detected."); return; }
+  resetLog("Ready. Connect your wallet.");
+  $("btnConnect").onclick = connect;
+  $("btnPay").onclick = payFlow;
+  $("btnFaucet").onclick = faucet;
+  window.ethereum.on?.("accountsChanged", a => { account=a[0]||null; $("cWallet").textContent = account?short(account):"not connected"; refresh().catch(()=>{}); });
+})();
+</script>
+</body>
+</html>

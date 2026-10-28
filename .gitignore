@@ -1,0 +1,5 @@
+.state/
+__pycache__/
+pulse.log
+pulse.log.old
+*.tmp
