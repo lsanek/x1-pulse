@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>X1 Pulse</title>
+<meta name="description" content="Live public overview of activity on the X1 blockchain: transactions, active wallets, top apps, MEMO minters and token risk lights.">
+<meta property="og:title" content="X1 Pulse">
+<meta property="og:description" content="What is happening on X1 right now – sampled on-chain data, updated every 15 minutes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230e1420'/%3E%3Cpath d='M3 17h7l3-8 5 15 3-7h8' fill='none' stroke='%235ad1e6' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+/* Layout: monitor-style dashboard – vital signs strip on top, then apps, MEMO and tokens. */
+:root{
+  --bg:#0e1420; --panel:#151d2c; --line:#263248; --fg:#e6ebf2; --muted:#8d98ab;
+  --signal:#5ad1e6; --signal-soft:rgba(90,209,230,.14);
+  --ok:#3ccf8e; --warn:#f2b84b; --bad:#f2605a;
+  --display:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root{--bg:#f3f6f9; --panel:#ffffff; --line:#d9e1ea; --fg:#13202f; --muted:#5c6b7d;
+    --signal:#0a7d93; --signal-soft:rgba(10,125,147,.10); --ok:#14895a; --warn:#a86b00; --bad:#c4362f; color-scheme:light}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--body);-webkit-font-smoothing:antialiased}
+a{color:var(--signal);text-decoration:none}
+a:hover{text-decoration:underline}
+a:focus-visible,button:focus-visible{outline:2px solid var(--signal);outline-offset:2px;border-radius:4px}
+.wrap{max-width:1120px;margin:0 auto;padding-block:28px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:grid;gap:22px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand h1{font:700 2rem/1 var(--display);letter-spacing:.02em;margin:0}
+.brand h1 span{color:var(--signal)}
+.tag{color:var(--muted);font-size:.92rem;margin:4px 0 0}
+.status{display:flex;align-items:center;gap:8px;font:500 .85rem var(--mono);color:var(--muted)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 var(--ok);animation:beat 2s infinite}
+.dot.stale{background:var(--warn);animation:none}
+@keyframes beat{0%{box-shadow:0 0 0 0 rgba(60,207,142,.6)}70%{box-shadow:0 0 0 9px rgba(60,207,142,0)}100%{box-shadow:0 0 0 0 rgba(60,207,142,0)}}
+@media (prefers-reduced-motion:reduce){.dot{animation:none}}
+.ecg{width:100%;height:64px;display:block}
+.vitals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.vital{background:var(--panel);padding:16px 18px;min-width:0}
+.vital .lbl{font:600 .72rem var(--body);text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.vital .val{font:600 1.9rem/1.15 var(--display);margin-top:6px;font-variant-numeric:tabular-nums}
+.vital .sub{font:400 .8rem var(--mono);color:var(--muted);margin-top:2px}
+.up{color:var(--ok)} .down{color:var(--bad)}
+section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;min-width:0}
+section h2{font:600 1.05rem var(--display);letter-spacing:.04em;text-transform:uppercase;margin:0 0 4px}
+section .hint{color:var(--muted);font-size:.85rem;margin:0 0 14px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}
+.chart svg{width:100%;height:auto;display:block}
+#chart{overflow-x:auto}
+#chart svg{min-width:560px}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tabs button{font:500 .8rem var(--mono);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer}
+.tabs button[aria-pressed="true"]{color:var(--fg);border-color:var(--signal);background:var(--signal-soft)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th{font:600 .7rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.addr{font-family:var(--mono);font-size:.82rem}
+.scroll{overflow-x:auto}
+.bar{height:6px;border-radius:3px;background:var(--signal-soft);margin-top:5px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--signal)}
+.pname{font-weight:500}
+.unk{color:var(--muted);font-style:italic}
+.tokens{display:grid;gap:10px}
+.tok{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 14px;align-items:start;padding:12px 14px;border:1px solid var(--line);border-radius:10px}
+.light{width:14px;height:14px;border-radius:50%;margin-top:4px}
+.light.low{background:var(--ok)} .light.medium{background:var(--warn)} .light.high{background:var(--bad)}
+.tok .nm{font-weight:600;overflow-wrap:anywhere}
+.tok .nm small{color:var(--muted);font-weight:400}
+.tok ul{margin:4px 0 0;padding-left:18px;color:var(--muted);font-size:.85rem}
+.tok .meta{font:400 .78rem var(--mono);color:var(--muted);margin-top:4px;overflow-wrap:anywhere}
+.score{font:600 1.15rem var(--display);text-align:right;white-space:nowrap}
+.score small{display:block;font:500 .68rem var(--body);text-transform:uppercase;letter-spacing:.08em}
+.score.low small{color:var(--ok)} .score.medium small{color:var(--warn)} .score.high small{color:var(--bad)}
+.acts{grid-column:2 / 4;display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.btn{font:500 .8rem var(--body);border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:6px;padding:5px 10px;cursor:pointer;text-decoration:none}
+.btn.primary{border-color:var(--signal);color:var(--signal)}
+.btn:hover{background:var(--signal-soft);text-decoration:none}
+.empty{color:var(--muted);font-size:.9rem;padding:8px 0}
+.cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;background:var(--signal-soft);border-color:var(--signal)}
+.cta p{margin:0;max-width:62ch}
+.cta strong{font-family:var(--display);letter-spacing:.02em}
+footer{color:var(--muted);font-size:.82rem;display:grid;gap:6px}
+footer p{margin:0;max-width:90ch}
+.err{border-color:var(--bad)}
+@media (max-width:860px){.vitals{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:420px){.vital .val{font-size:1.55rem}.brand h1{font-size:1.7rem}.tok{grid-template-columns:auto minmax(0,1fr)}.score{grid-column:2;text-align:left}.acts{grid-column:1 / 3}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand"><h1>X1 <span>Pulse</span></h1></div>
+      <p class="tag">What is happening on the X1 blockchain, sampled from public on-chain data.</p>
+    </div>
+    <div class="status" aria-live="polite"><span class="dot" id="dot"></span><span id="updated">Loading data…</span></div>
+  </header>
+
+  <svg class="ecg" id="ecg" viewBox="0 0 1000 64" preserveAspectRatio="none" aria-hidden="true"></svg>
+
+  <div class="vitals" id="vitals">
+    <div class="vital"><div class="lbl">User transactions · 24h</div><div class="val" id="v-tx">–</div><div class="sub" id="v-tx-s">estimated from sample</div></div>
+    <div class="vital"><div class="lbl">Active wallets · 24h</div><div class="val" id="v-w">–</div><div class="sub" id="v-w-s">fee payers seen in sample</div></div>
+    <div class="vital"><div class="lbl">User tx per block</div><div class="val" id="v-tpb">–</div><div class="sub">validator votes excluded</div></div>
+    <div class="vital"><div class="lbl">Network speed</div><div class="val" id="v-sps">–</div><div class="sub" id="v-slot">slots per second</div></div>
+  </div>
+
+  <section class="chart" id="trend">
+    <h2>Activity trend</h2>
+    <p class="hint" id="trend-hint">Estimated user transactions.</p>
+    <div class="tabs" role="group" aria-label="Trend range">
+      <button type="button" id="t-24" aria-pressed="true">24 hours</button>
+      <button type="button" id="t-7" aria-pressed="false">7 days</button>
+    </div>
+    <div id="chart"></div>
+  </section>
+
+  <div class="grid2">
+    <section>
+      <h2>Top apps &amp; programs</h2>
+      <p class="hint">Share of sampled user transactions that touched each program (last 24h).</p>
+      <div class="scroll"><table id="programs"><thead><tr><th>Program</th><th class="num">Tx</th><th class="num">Share</th></tr></thead><tbody></tbody></table></div>
+    </section>
+    <section>
+      <h2>MEMO leaderboard</h2>
+      <p class="hint">MEMO is minted by writing a memo on X1 at <a href="https://memo.rip" target="_blank" rel="noopener">memo.rip</a>.</p>
+      <div class="tabs" role="group" aria-label="MEMO view">
+        <button type="button" id="m-min" aria-pressed="true">Top minters · 24h</button>
+        <button type="button" id="m-hold" aria-pressed="false">Top holders · all time</button>
+      </div>
+      <div class="scroll"><table id="memo"><thead></thead><tbody></tbody></table></div>
+    </section>
+  </div>
+
+  <section>
+    <h2>Most active tokens</h2>
+    <p class="hint">Tokens that appeared in the most sampled transactions. Risk light uses the same checks as @X1RugCheckerBot: mint &amp; freeze authority, Token-2022 traps, holder concentration.</p>
+    <div class="tokens" id="tok-active"></div>
+  </section>
+
+  <section>
+    <h2>New tokens · last 7 days</h2>
+    <p class="hint">Token mints created in sampled blocks. New tokens are rare on X1, and the sample can miss some.</p>
+    <div class="tokens" id="tok-new"></div>
+  </section>
+
+  <section class="cta">
+    <p><strong>Got a token address?</strong> Paste it into the free Telegram bot for a full rug-pull report with holder owners, token age and an AI summary.</p>
+    <a class="btn primary" id="bot-cta" href="https://t.me/X1RugCheckerBot" target="_blank" rel="noopener">Open @X1RugCheckerBot</a>
+  </section>
+
+  <footer>
+    <p id="sample-note">Data is a sample, not a full count.</p>
+    <p>Risk lights are automatic and can be wrong. A large holder may be a DEX pool or a burn address. This is not financial advice.</p>
+    <p>Data source: public X1 RPC. Updated about every 15 minutes. Daily X1 numbers on X: @Metateron3.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var D = null, trendRange = "24", memoView = "min";
+  var $ = function(id){ return document.getElementById(id); };
+  var nf = new Intl.NumberFormat("en-US");
+  function fmt(n){ return n == null ? "–" : nf.format(Math.round(n)); }
+  function compact(n){
+    if (n == null) return "–";
+    if (n >= 1e6) return (n/1e6).toFixed(n >= 1e7 ? 0 : 1) + "M";
+    if (n >= 1e4) return (n/1e3).toFixed(n >= 1e5 ? 0 : 1) + "k";
+    return nf.format(Math.round(n));
+  }
+  function amt(n){ return n == null ? "–" : n >= 1000 ? nf.format(Math.round(n)) : n.toFixed(2); }
+  function short(a){ return a ? a.slice(0,4) + "…" + a.slice(-4) : "?"; }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function ex(a){ return (D && D.links ? D.links.explorer : "https://explorer.mainnet.x1.xyz/address/") + encodeURIComponent(a); }
+  function addrLink(a){ return '<a class="addr" href="' + ex(a) + '" target="_blank" rel="noopener" title="' + esc(a) + '">' + esc(short(a)) + '</a>'; }
+  function ago(t){
+    var s = Math.max(0, Date.now()/1000 - t);
+    if (s < 90) return "just now";
+    if (s < 3600) return Math.round(s/60) + " min ago";
+    if (s < 172800) return Math.round(s/3600) + " h ago";
+    return Math.round(s/86400) + " days ago";
+  }
+  function change(cur, prev){
+    if (!prev || cur == null) return "";
+    var p = (cur - prev) / prev * 100;
+    return '<span class="' + (p >= 0 ? "up" : "down") + '">' + (p >= 0 ? "▲ " : "▼ ") + Math.abs(p).toFixed(0) + "%</span> vs previous 24h";
+  }
+
+  function ecg(){
+    var svg = $("ecg"), pts = (D.activity.hourly || []).map(function(h){ return h.tx; });
+    var vals = pts.filter(function(v){ return v != null; });
+    var max = Math.max.apply(null, vals.concat([1]));
+    var n = pts.length || 1, w = 1000 / n, d = "M0 40", x;
+    for (var i = 0; i < n; i++){
+      x = i * w;
+      var amp = pts[i] == null ? 0 : 6 + 28 * pts[i] / max;
+      d += " L" + (x + w*0.35).toFixed(1) + " 40 L" + (x + w*0.45).toFixed(1) + " " + (40 - amp).toFixed(1) +
+           " L" + (x + w*0.55).toFixed(1) + " " + (40 + amp*0.45).toFixed(1) + " L" + (x + w*0.65).toFixed(1) + " 40";
+    }
+    d += " L1000 40";
+    svg.innerHTML = '<path d="' + d + '" fill="none" stroke="var(--signal)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" opacity=".9"/>';
+  }
+
+  function chart(){
+    var series = trendRange === "24" ? D.activity.hourly : D.activity.daily;
+    var labelOf = trendRange === "24"
+      ? function(t){ var d = new Date(t*1000); return String(d.getHours()).padStart(2,"0") + ":00"; }
+      : function(t){ return new Date(t*1000).toLocaleDateString("en-GB", {day:"numeric", month:"short"}); };
+    $("trend-hint").textContent = trendRange === "24"
+      ? "Estimated user transactions per hour, your local time. Gaps mean no sample in that hour."
+      : "Estimated user transactions per day. History builds up over the first week.";
+    var W = 760, H = 220, L = 52, R = 10, T = 12, B = 28;
+    var vals = series.map(function(s){ return s.tx; }), real = vals.filter(function(v){ return v != null; });
+    var max = Math.max.apply(null, real.concat([1]));
+    var mag = Math.pow(10, Math.floor(Math.log10(max))), nice = Math.ceil(max / mag) * mag;
+    var n = series.length, bw = (W - L - R) / n;
+    var y = function(v){ return T + (H - T - B) * (1 - v / nice); };
+    var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Activity trend chart">';
+    for (var g = 0; g <= 4; g++){
+      var gv = nice * g / 4, gy = y(gv);
+      out += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + gy + '" y2="' + gy + '" stroke="var(--line)" stroke-width="1"/>';
+      out += '<text x="' + (L - 8) + '" y="' + (gy + 4) + '" text-anchor="end" font-size="11" font-family="IBM Plex Mono,monospace" fill="var(--muted)">' + compact(gv) + '</text>';
+    }
+    var lastIdx = -1;
+    series.forEach(function(s, i){ if (s.tx != null) lastIdx = i; });
+    series.forEach(function(s, i){
+      var x = L + i * bw;
+      if (s.tx != null){
+        var top = y(s.tx), h = Math.max(1, H - B - top);
+        out += '<rect x="' + (x + bw*0.15).toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + (bw*0.7).toFixed(1) + '" height="' + h.toFixed(1) +
+               '" rx="2" fill="var(--signal)" opacity="' + (i === lastIdx ? 1 : 0.55) + '"><title>' + labelOf(s.t) + ': ~' + fmt(s.tx) + ' tx, ' + (s.wallets == null ? "?" : s.wallets) + ' wallets</title></rect>';
+      }
+      var every = trendRange === "24" ? 4 : 1;
+      if ((n - 1 - i) % every === 0){
+        out += '<text x="' + (x + bw/2).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="11" font-family="IBM Plex Mono,monospace" fill="var(--muted)">' + labelOf(s.t) + '</text>';
+      }
+    });
+    out += '</svg>';
+    if (!real.length) out = '<p class="empty">Not enough history yet. The chart fills in as new samples arrive.</p>';
+    $("chart").innerHTML = out;
+    $("t-24").setAttribute("aria-pressed", trendRange === "24");
+    $("t-7").setAttribute("aria-pressed", trendRange === "7");
+  }
+
+  function programs(){
+    var rows = (D.programs || []).map(function(p){
+      var nm = p.name === "Unknown program" ? '<span class="unk">Unknown program</span> ' + addrLink(p.id) : '<span class="pname">' + esc(p.name) + '</span>';
+      return '<tr><td>' + nm + '<div class="bar"><i style="width:' + Math.min(100, p.share).toFixed(1) + '%"></i></div></td><td class="num">' + fmt(p.tx) + '</td><td class="num">' + p.share.toFixed(1) + '%</td></tr>';
+    });
+    $("programs").tBodies[0].innerHTML = rows.join("") || '<tr><td colspan="3" class="empty">No data yet.</td></tr>';
+  }
+
+  function memo(){
+    var m = D.memo || {}, head, rows;
+    if (memoView === "min"){
+      head = '<tr><th>#</th><th>Wallet</th><th class="num">Mint tx</th><th class="num">MEMO gained</th></tr>';
+      rows = (m.minters || []).map(function(r, i){ return '<tr><td>' + (i+1) + '</td><td>' + addrLink(r.wallet) + '</td><td class="num">' + fmt(r.tx) + '</td><td class="num">' + amt(r.amount) + '</td></tr>'; });
+    } else {
+      head = '<tr><th>#</th><th>Owner</th><th class="num">MEMO</th><th class="num">Supply</th></tr>';
+      rows = (m.holders || []).map(function(r, i){ return '<tr><td>' + (i+1) + '</td><td>' + addrLink(r.owner) + '</td><td class="num">' + amt(r.amount) + '</td><td class="num">' + r.pct.toFixed(2) + '%</td></tr>'; });
+    }
+    $("memo").tHead.innerHTML = head;
+    $("memo").tBodies[0].innerHTML = rows.join("") || '<tr><td colspan="4" class="empty">No MEMO activity in the sample yet.</td></tr>';
+    $("m-min").setAttribute("aria-pressed", memoView === "min");
+    $("m-hold").setAttribute("aria-pressed", memoView === "hold");
+  }
+
+  function tokenCard(t, isNew){
+    var label = {low:"Low risk", medium:"Medium risk", high:"High risk"}[t.risk] || "Unknown";
+    var name = t.name ? esc(t.name) + (t.symbol ? ' <small>' + esc(t.symbol) + '</small>' : "") : '<small>Unnamed token</small>';
+    var flags = (t.flags || []).map(function(f){ return "<li>" + esc(f) + "</li>"; }).join("");
+    var meta = short(t.mint) + " · " + (t.program === "spl-token-2022" ? "Token-2022" : "SPL Token") +
+      (isNew && t.first_seen ? " · first seen " + ago(t.first_seen) : "") + (t.tx ? " · " + fmt(t.tx) + " tx in sample" : "");
+    return '<div class="tok"><span class="light ' + esc(t.risk) + '" role="img" aria-label="' + label + '"></span>' +
+      '<div><div class="nm">' + name + '</div>' + (flags ? "<ul>" + flags + "</ul>" : '<div class="meta">No red flags in the quick check.</div>') +
+      '<div class="meta">' + esc(meta) + '</div></div>' +
+      '<div class="score ' + esc(t.risk) + '">' + t.score + '/100<small>' + label + '</small></div>' +
+      '<div class="acts"><a class="btn primary" href="' + esc(D.links.bot) + '" target="_blank" rel="noopener">Full check → @X1RugCheckerBot</a>' +
+      '<button type="button" class="btn copy" data-mint="' + esc(t.mint) + '">Copy address</button>' +
+      '<a class="btn" href="' + ex(t.mint) + '" target="_blank" rel="noopener">Explorer</a></div></div>';
+  }
+
+  function tokens(){
+    var a = D.tokens.active || [], n = D.tokens.new || [];
+    $("tok-active").innerHTML = a.map(function(t){ return tokenCard(t, false); }).join("") || '<p class="empty">No token activity in the sample.</p>';
+    $("tok-new").innerHTML = n.map(function(t){ return tokenCard(t, true); }).join("") || '<p class="empty">No new tokens seen in the last 7 days of samples.</p>';
+  }
+
+  function vitals(){
+    var a = D.activity;
+    $("v-tx").textContent = compact(a.tx_24h);
+    $("v-tx-s").innerHTML = change(a.tx_24h, a.tx_prev_24h) || "estimated from sample";
+    $("v-w").textContent = fmt(a.wallets_24h);
+    $("v-w-s").innerHTML = change(a.wallets_24h, a.wallets_prev_24h) || "fee payers seen in sample";
+    $("v-tpb").textContent = a.tx_per_block.toFixed(1);
+    $("v-sps").textContent = D.network.slots_per_sec.toFixed(2);
+    $("v-slot").textContent = "slots/s · slot " + fmt(D.network.slot);
+    var s = D.sample;
+    $("sample-note").textContent = "Sample: " + fmt(s.blocks_sampled) + " of " + fmt(s.blocks_produced) +
+      " blocks produced in the covered time (" + s.hours_covered + " h of the last 24 h). Transaction totals are estimates: average per sampled block × blocks produced per day. Wallet counts only include wallets seen in sampled blocks, so the real number is higher.";
+  }
+
+  function status(){
+    if (!D) return;
+    var stale = Date.now()/1000 - D.generated_at > 45*60;
+    $("dot").className = "dot" + (stale ? " stale" : "");
+    $("updated").textContent = (stale ? "Last update " : "Updated ") + ago(D.generated_at) +
+      " · " + new Date(D.generated_at*1000).toLocaleString("en-GB", {hour:"2-digit", minute:"2-digit", day:"numeric", month:"short"});
+  }
+
+  function render(){ status(); vitals(); ecg(); chart(); programs(); memo(); tokens(); if (D.links && D.links.bot) $("bot-cta").href = D.links.bot; }
+
+  function load(){
+    fetch("data.json?t=" + Date.now(), {cache:"no-store"})
+      .then(function(r){ if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function(d){ D = d; render(); })
+      .catch(function(){
+        if (!D){ $("updated").textContent = "Data is not available right now. Try again in a few minutes."; $("dot").className = "dot stale"; }
+      });
+  }
+
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("button");
+    if (!b) return;
+    if (b.id === "t-24" || b.id === "t-7"){ trendRange = b.id === "t-24" ? "24" : "7"; if (D) chart(); }
+    else if (b.id === "m-min" || b.id === "m-hold"){ memoView = b.id === "m-min" ? "min" : "hold"; if (D) memo(); }
+    else if (b.classList.contains("copy")){
+      var mint = b.getAttribute("data-mint"), done = function(){ b.textContent = "Copied"; setTimeout(function(){ b.textContent = "Copy address"; }, 1500); };
+      if (navigator.clipboard) navigator.clipboard.writeText(mint).then(done, function(){ prompt("Copy the address:", mint); });
+      else prompt("Copy the address:", mint);
+    }
+  });
+
+  load();
+  setInterval(load, 5*60*1000);
+  setInterval(status, 30*1000);
+})();
+</script>
+</body>
+</html>
