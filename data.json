@@ -1,0 +1,548 @@
+{
+ "generated_at": 1793476401,
+ "network": {
+  "slot": 89966171,
+  "slots_per_sec": 2.74
+ },
+ "sample": {
+  "runs": 94,
+  "blocks_sampled": 1880,
+  "blocks_produced": 237921,
+  "hours_covered": 24.2,
+  "tx_in_sample": 7409,
+  "per_run": 20
+ },
+ "activity": {
+  "tx_24h": 930091,
+  "tx_prev_24h": 1170107,
+  "tx_per_block": 3.94,
+  "wallets_24h": 64,
+  "wallets_prev_24h": 74,
+  "blocks_per_day": 236006,
+  "hourly": [
+   {
+    "t": 1793393601,
+    "tx": 26276,
+    "wallets": 20
+   },
+   {
+    "t": 1793397201,
+    "tx": 23126,
+    "wallets": 21
+   },
+   {
+    "t": 1793400801,
+    "tx": 18439,
+    "wallets": 21
+   },
+   {
+    "t": 1793404401,
+    "tx": 24139,
+    "wallets": 22
+   },
+   {
+    "t": 1793408001,
+    "tx": 32431,
+    "wallets": 24
+   },
+   {
+    "t": 1793411601,
+    "tx": 37148,
+    "wallets": 22
+   },
+   {
+    "t": 1793415201,
+    "tx": 72812,
+    "wallets": 22
+   },
+   {
+    "t": 1793418801,
+    "tx": 35409,
+    "wallets": 20
+   },
+   {
+    "t": 1793422401,
+    "tx": 29273,
+    "wallets": 19
+   },
+   {
+    "t": 1793426001,
+    "tx": 21784,
+    "wallets": 21
+   },
+   {
+    "t": 1793429601,
+    "tx": 21990,
+    "wallets": 19
+   },
+   {
+    "t": 1793433201,
+    "tx": 23261,
+    "wallets": 19
+   },
+   {
+    "t": 1793436801,
+    "tx": 19593,
+    "wallets": 19
+   },
+   {
+    "t": 1793440401,
+    "tx": 24131,
+    "wallets": 24
+   },
+   {
+    "t": 1793444001,
+    "tx": 27860,
+    "wallets": 30
+   },
+   {
+    "t": 1793447601,
+    "tx": 49316,
+    "wallets": 25
+   },
+   {
+    "t": 1793451201,
+    "tx": 32885,
+    "wallets": 22
+   },
+   {
+    "t": 1793454801,
+    "tx": 64430,
+    "wallets": 21
+   },
+   {
+    "t": 1793458401,
+    "tx": 46540,
+    "wallets": 20
+   },
+   {
+    "t": 1793462001,
+    "tx": 70192,
+    "wallets": 23
+   },
+   {
+    "t": 1793465601,
+    "tx": 96932,
+    "wallets": 21
+   },
+   {
+    "t": 1793469201,
+    "tx": 68346,
+    "wallets": 20
+   },
+   {
+    "t": 1793472801,
+    "tx": 36642,
+    "wallets": 23
+   },
+   {
+    "t": 1793476401,
+    "tx": 25580,
+    "wallets": 21
+   }
+  ],
+  "daily": [
+   {
+    "t": 1792958001,
+    "tx": null,
+    "wallets": null
+   },
+   {
+    "t": 1793044401,
+    "tx": null,
+    "wallets": null
+   },
+   {
+    "t": 1793130801,
+    "tx": null,
+    "wallets": null
+   },
+   {
+    "t": 1793217201,
+    "tx": 1539257,
+    "wallets": 50
+   },
+   {
+    "t": 1793303601,
+    "tx": 979174,
+    "wallets": 56
+   },
+   {
+    "t": 1793390001,
+    "tx": 1170107,
+    "wallets": 74
+   },
+   {
+    "t": 1793476401,
+    "tx": 930091,
+    "wallets": 64
+   }
+  ]
+ },
+ "programs": [
+  {
+   "id": "11111111111111111111111111111111",
+   "name": "System (XNT transfers)",
+   "tx": 3682,
+   "share": 49.69631529221218
+  },
+  {
+   "id": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "name": "Token-2022 (X1)",
+   "tx": 3408,
+   "share": 45.998110406262654
+  },
+  {
+   "id": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+   "name": "Memo",
+   "tx": 3361,
+   "share": 45.363746794439194
+  },
+  {
+   "id": "8iq6zqaEVcfaym2u8t939PAN5jmfPVc6Z333RuxKTTZX",
+   "name": "MEMO minting (memo.rip)",
+   "tx": 3349,
+   "share": 45.20178161695236
+  },
+  {
+   "id": "BxUNg2yo5371BQMZPkfcxdCptFRDHkhvEXNM1QNPBRYU",
+   "name": "Randomness oracle (commit/reveal bot)",
+   "tx": 295,
+   "share": 3.9816439465514915
+  },
+  {
+   "id": "sEsYH97wqmfnkzHedjNcw3zyJdPvUmsa9AixhS4b4fN",
+   "name": "Unknown program",
+   "tx": 69,
+   "share": 0.9312997705493318
+  },
+  {
+   "id": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+   "name": "SPL Token",
+   "tx": 65,
+   "share": 0.8773113780537184
+  },
+  {
+   "id": "FDyWtM9UBNfXNuc5oZJ1V86d3dz635WnqMfX8x5Uifbm",
+   "name": "Unknown program",
+   "tx": 7,
+   "share": 0.09447968686732353
+  },
+  {
+   "id": "BSKTJpgAGHRaSMLA88chYPKuSuD9qbesEcHYmUrBWU7R",
+   "name": "Unknown program",
+   "tx": 7,
+   "share": 0.09447968686732353
+  },
+  {
+   "id": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+   "name": "Associated Token Account",
+   "tx": 6,
+   "share": 0.08098258874342017
+  }
+ ],
+ "memo": {
+  "mint": "memoX1sJsBY6od7CfQ58XooRALwnocAZen4L7mW1ick",
+  "program": "8iq6zqaEVcfaym2u8t939PAN5jmfPVc6Z333RuxKTTZX",
+  "site": "https://memo.rip",
+  "supply": "12,284,039",
+  "minters": [
+   {
+    "wallet": "CWJCzRKjaDu352MaVegDJSiZu5JRny5cVruBnTVPQVER",
+    "tx": 2585,
+    "amount": 2326.5
+   },
+   {
+    "wallet": "9CRGtzTrbAp3QWLmPm7Ve4WEm4UuhgndN9njeEqj8RYY",
+    "tx": 529,
+    "amount": 476.1
+   },
+   {
+    "wallet": "Dm2oXLyxHxNKjGCdDK5HNQEa7PHMg5jHWJk5CL5kFRWP",
+    "tx": 201,
+    "amount": 173.7
+   },
+   {
+    "wallet": "7VkcYL1TYh5JhEA1pYsoM9c57QaQ1qjvNcwnaNmaXukc",
+    "tx": 34,
+    "amount": 30.6
+   }
+  ],
+  "holders": [
+   {
+    "owner": "9Dpjw2pB5kXJr6ZTHiqzEMfJPic3om9jgNacnwpLCoaU",
+    "amount": 3635404.619387,
+    "pct": 29.594538240940132
+   },
+   {
+    "owner": "4baBK2uFD1cAZnbgNgBj8RWJjvpf5JECjBJjYkq7kRmv",
+    "amount": 1001337.0,
+    "pct": 8.151528988144698
+   },
+   {
+    "owner": "EkD5XJrfgbZbBZ6zYx9Rdaqw4z2t4TCe6gh5BE4KJc76",
+    "amount": 1000000.817365,
+    "pct": 8.140651599730349
+   },
+   {
+    "owner": "9CRGtzTrbAp3QWLmPm7Ve4WEm4UuhgndN9njeEqj8RYY",
+    "amount": 856556.6,
+    "pct": 6.972923156626252
+   },
+   {
+    "owner": "46Hc9dU2cJQGSEYRJ8YjCyPYtWv4Bbs86pWoqirufFtW",
+    "amount": 616736.610308,
+    "pct": 5.020633769625772
+   },
+   {
+    "owner": "4jJ5QiGy6i3DZB1ghuLLdXdgZ2iafnwcTbb8NLhAJiwt",
+    "amount": 530019.4,
+    "pct": 4.314699749813559
+   },
+   {
+    "owner": "F5wL2Ufe1egk2n9PPLRZfL2SCpgWrK8zUsiqVYDq55AK",
+    "amount": 328736.0,
+    "pct": 2.6761230569196335
+   },
+   {
+    "owner": "2LxnNubt1ixhpC8fdiouzTsq9NhJWxFspa3rUeuShPtw",
+    "amount": 295076.8,
+    "pct": 2.4021154605582087
+   },
+   {
+    "owner": "38EMLARfmikZDwLgcHim6kGdVFhbccunJqKnXT1rre51",
+    "amount": 271214.0,
+    "pct": 2.2078568783443298
+   },
+   {
+    "owner": "HAjaoDC5CL56EbtcqwzMp9oWUqNgcZcTtyki6xEkpX1C",
+    "amount": 245222.8,
+    "pct": 1.9962717474276988
+   }
+  ],
+  "mint_tx_24h": 3349
+ },
+ "tokens": {
+  "active": [
+   {
+    "mint": "memoX1sJsBY6od7CfQ58XooRALwnocAZen4L7mW1ick",
+    "name": "MEMO Engraves Memories Onchain",
+    "symbol": "MEMO",
+    "score": 55,
+    "risk": "medium",
+    "flags": [
+     "Mint authority is ACTIVE – the creator can print unlimited new tokens.",
+     "Largest holder owns 29.9% of supply.",
+     "Top 10 holders own 71.2% of supply."
+    ],
+    "program": "spl-token-2022",
+    "supply": "12,153,149.3",
+    "mint_authority": true,
+    "freeze_authority": false,
+    "tx": 3350
+   },
+   {
+    "mint": "B69chRzqzDCmdB5WYB8NRu5Yv5ZA95ABiZcdzCgGm9Tq",
+    "name": "USDC.X",
+    "symbol": "USDC.X",
+    "score": 65,
+    "risk": "medium",
+    "flags": [
+     "Mint authority is ACTIVE – the creator can print unlimited new tokens.",
+     "Top 10 holders own 59.5% of supply."
+    ],
+    "program": "spl-token-2022",
+    "supply": "83,615.3966",
+    "mint_authority": true,
+    "freeze_authority": false,
+    "tx": 27
+   },
+   {
+    "mint": "EFPkbXTdr3c7aRbCEKoJDYdbbzgzVDBShYGybP3gQwmy",
+    "name": "ANL Protocol",
+    "symbol": "ANL",
+    "score": 85,
+    "risk": "low",
+    "flags": [
+     "Largest holder owns 20.1% of supply.",
+     "Top 10 holders own 61.8% of supply."
+    ],
+    "program": "spl-token-2022",
+    "supply": "995,042,993.5738",
+    "mint_authority": false,
+    "freeze_authority": false,
+    "tx": 18
+   },
+   {
+    "mint": "81LkybSBLvXYMTF6azXohUWyBvDGUXznm4yiXPkYkDTJ",
+    "name": "Pepe",
+    "symbol": "PEPE",
+    "score": 100,
+    "risk": "low",
+    "flags": [],
+    "program": "spl-token-2022",
+    "supply": "69,419,919,240.8533",
+    "mint_authority": false,
+    "freeze_authority": false,
+    "tx": 10
+   },
+   {
+    "mint": "7jP6rm8zEd2kLgt1vRTzmA11MmbhypHRdU1VyZPripp",
+    "name": "Ripper staked XNT",
+    "symbol": "rXNT",
+    "score": 30,
+    "risk": "high",
+    "flags": [
+     "Mint authority is ACTIVE – the creator can print unlimited new tokens.",
+     "Largest holder owns 99.7% of supply.",
+     "Top 10 holders own 100.0% of supply."
+    ],
+    "program": "spl-token-2022",
+    "supply": "10,000,972.3517",
+    "mint_authority": true,
+    "freeze_authority": false,
+    "tx": 9
+   },
+   {
+    "mint": "D1WKzPhAVeKejYej4uA1V54MAiYkyTx8w3ZWVzVmukFf",
+    "name": "MR. EGGPLANT",
+    "symbol": "MR. EGGPLANT",
+    "score": 75,
+    "risk": "low",
+    "flags": [
+     "Largest holder owns 27.2% of supply.",
+     "Top 10 holders own 85.0% of supply."
+    ],
+    "program": "spl-token-2022",
+    "supply": "908,485,721.9999",
+    "mint_authority": false,
+    "freeze_authority": false,
+    "tx": 8
+   },
+   {
+    "mint": "ACor5a1JMRsnbMKcibnNZfbY5nfiBg3TwRvWSNUE2DVb",
+    "name": "Platinum",
+    "symbol": "PLAT",
+    "score": 75,
+    "risk": "low",
+    "flags": [
+     "Largest holder owns 23.0% of supply.",
+     "Top 10 holders own 87.0% of supply."
+    ],
+    "program": "spl-token-2022",
+    "supply": "999,996.9013",
+    "mint_authority": false,
+    "freeze_authority": false,
+    "tx": 6
+   },
+   {
+    "mint": "fTfXmcxg3p5qYU3jp5kiaMAca9sVkwcHyY7YBS5Qp5K",
+    "name": "VITALGALIA certifié",
+    "symbol": "VITALG",
+    "score": 75,
+    "risk": "low",
+    "flags": [
+     "Largest holder owns 30.0% of supply.",
+     "Top 10 holders own 100.0% of supply."
+    ],
+    "program": "spl-token-2022",
+    "supply": "10,000,000,000",
+    "mint_authority": false,
+    "freeze_authority": false,
+    "tx": 5
+   },
+   {
+    "mint": "mrej2ckuXhbuzpa331AvxvvVUAbV4DyTLcLLEp6Brb5",
+    "name": "1up",
+    "symbol": "1UP",
+    "score": 60,
+    "risk": "medium",
+    "flags": [
+     "Largest holder owns 100.0% of supply.",
+     "Top 10 holders own 100.0% of supply."
+    ],
+    "program": "spl-token-2022",
+    "supply": "42,064.4099",
+    "mint_authority": false,
+    "freeze_authority": false,
+    "tx": 4
+   },
+   {
+    "mint": "4o4UheANLdqF4gSV4zWTbCTCercQNSaTm6nVcDetzPb2",
+    "name": "404",
+    "symbol": "404",
+    "score": 75,
+    "risk": "low",
+    "flags": [
+     "Largest holder owns 39.6% of supply.",
+     "Top 10 holders own 82.6% of supply."
+    ],
+    "program": "spl-token-2022",
+    "supply": "404,402.6254",
+    "mint_authority": false,
+    "freeze_authority": false,
+    "tx": 4
+   }
+  ],
+  "new": [
+   {
+    "mint": "2B6xKndYedWac1zyMgDN4dn7PpT5p5VNpD82X6GR9wv9",
+    "name": null,
+    "symbol": null,
+    "score": 5,
+    "risk": "high",
+    "flags": [
+     "Mint authority is ACTIVE – the creator can print unlimited new tokens.",
+     "Freeze authority is ACTIVE – the creator can freeze your tokens.",
+     "Largest holder owns 100.0% of supply."
+    ],
+    "program": "spl-token",
+    "supply": "1",
+    "mint_authority": true,
+    "freeze_authority": true,
+    "first_seen": 1793461320,
+    "tx": 1
+   },
+   {
+    "mint": "9wiLwhjSzdYYzhxxsnHyJ1RBqkSQacKsTk7LzBMhYbMc",
+    "name": null,
+    "symbol": null,
+    "score": 5,
+    "risk": "high",
+    "flags": [
+     "Mint authority is ACTIVE – the creator can print unlimited new tokens.",
+     "Freeze authority is ACTIVE – the creator can freeze your tokens.",
+     "Largest holder owns 100.0% of supply."
+    ],
+    "program": "spl-token",
+    "supply": "1",
+    "mint_authority": true,
+    "freeze_authority": true,
+    "first_seen": 1793366313,
+    "tx": 0
+   },
+   {
+    "mint": "3tGmngiMm5S8rgVNVGMuof7rEKj2RoPYkrcosiLGcNu2",
+    "name": "DRAFT",
+    "symbol": "DRAFT",
+    "score": 30,
+    "risk": "high",
+    "flags": [
+     "Mint authority is ACTIVE – the creator can print unlimited new tokens.",
+     "Largest holder owns 100.0% of supply.",
+     "Top 10 holders own 100.0% of supply."
+    ],
+    "program": "spl-token-2022",
+    "supply": "1,000,000,000",
+    "mint_authority": true,
+    "freeze_authority": false,
+    "first_seen": 1793174454,
+    "tx": 0
+   }
+  ]
+ },
+ "links": {
+  "bot": "https://t.me/X1RugCheckerBot",
+  "explorer": "https://explorer.mainnet.x1.xyz/address/"
+ }
+}
